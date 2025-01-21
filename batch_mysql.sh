@@ -43,6 +43,7 @@ DB=(
 BASE_DIR="/www/wwwroot"
 LOG_FILE="/var/log/composer_update.log"
 
+DB_HOST="127.0.0.1"
 DB_USER="steven"
 DB_PASS="Z19aMpbacka6w5Q9ZkcR"
 
@@ -81,14 +82,14 @@ sync_user_sql() {
     echo -e "${GREEN}SQL file copied to $server${NC}"
 
      # Check if the database exists
-    ssh root@$server "mysql -u $DB_USER -p'$DB_PASS' -e 'USE $db_name'" 2>/dev/null
+    ssh root@$server "mysql -h $DB_HOST -u $DB_USER -p'$DB_PASS' -e 'USE $db_name'" 2>/dev/null
     if [ $? -ne 0 ]; then
         log "Database $db_name does not exist on $server. Skipping..."
         return
     fi
 
 
-    ssh root@$server "mysql -u $DB_USER -p'$DB_PASS' $db_name < $sql_file" || error "Failed to sync $sql_file on $server"
+    ssh root@$server "mysql -h $DB_HOST -u $DB_USER -p'$DB_PASS' $db_name < $sql_file" || error "Failed to sync $sql_file on $server"
 }
 
 # Main script execution
