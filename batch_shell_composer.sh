@@ -37,10 +37,25 @@ execute_composer_update() {
     echo -e "${YELLOW}Server: ${server}${NC}"
 
     echo -e "${YELLOW}Updating $dir...${NC}"
+
+    # Check if the Apis directory exists
+    if ssh -n "$server" "[ -d ${BASE_DIR}/Apps/Apis ]"; then
+        echo -e "${YELLOW}Executing composer update in $dir on $server${NC}"
+        ssh -n "$server" "cd ${BASE_DIR}/Apps/Apis/ && git pull && cd ${BASE_DIR}/${dir} && git config --global --add safe.directory ${BASE_DIR}/${dir} && git pull && composer update" 2>&1 || {
+            error "Composer update failed in $dir on $server"
+        }
+    else
+        echo -e "${YELLOW}Executing composer update in $dir on $server without Apis directory${NC}"
+        ssh -n "$server" "cd ${BASE_DIR}/${dir} && git config --global --add safe.directory ${BASE_DIR}/${dir} && git pull && composer update" 2>&1 || {
+            error "Composer update failed in $dir on $server"
+        }
+    fi
+
+    echo -e "${YELLOW}Executing composer update in $dir on $server${NC}"
     
-    ssh -n "$server" "cd ${BASE_DIR}/${dir} && git config --global --add safe.directory ${BASE_DIR}/${dir} && git pull && composer update" 2>&1 || {
-        error "Composer update failed in $dir on $server"
-    }
+    # ssh -n "$server" "cd ${BASE_DIR}/Apps/Apis/ && git pull && cd ${BASE_DIR}/${dir} && git config --global --add safe.directory ${BASE_DIR}/${dir} && git pull && composer update" 2>&1 || {
+    #     error "Composer update failed in $dir on $server"
+    # }
 
     echo -e "${GREEN}Composer update completed in $dir on $server${NC}"
 
