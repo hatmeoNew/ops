@@ -1,11 +1,11 @@
 #!/bin/bash
 # filepath: /www/wwwroot/shell/restore_website.sh
 
-MYSQL_USER="api_kundies_de"
-MYSQL_PASS="XiXwwQPRQWFYfzm5"
-MYSQL_DB="api_kundies_de"
+MYSQL_USER="api_wngift_de"
+MYSQL_PASS="tNzNFZ8GdB49CynD"
+MYSQL_DB="api_wngift_de"
 MYSQL_HOST="127.0.0.1"
-MYSQL_DUMP_FILE="api_kundies_com-2025-01-21.sql.gz"
+MYSQL_DUMP_FILE="api_wngift_com-2025-01-22.sql.gz"
 TEMP_SQL_FILE="/tmp/mysql_dump.sql"
 
 REDIS_RDB_FILE="redis-dump-12-2025-01-21.rdb"
