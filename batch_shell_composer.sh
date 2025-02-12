@@ -46,7 +46,7 @@ execute_composer_update() {
         }
     else
         echo -e "${YELLOW}Executing composer update in $dir on $server without Apis directory${NC}"
-        ssh -n "$server" "cd ${BASE_DIR}/${dir} && git config --global --add safe.directory ${BASE_DIR}/${dir} && git pull && composer update" 2>&1 || {
+        ssh -n "$server" "cd ${BASE_DIR}/${dir} && git config --global --add safe.directory ${BASE_DIR}/${dir} && git checkout main_api && git pull && composer update" 2>&1 || {
             error "Composer update failed in $dir on $server"
         }
     fi
