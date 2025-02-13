@@ -2,11 +2,11 @@
 
 #Variables
 BACKUP_DIR="/www/wwwroot/backup"
-DB_NAME="api_kundies_com"
+DB_NAME="api_hautotool_co"
 DB_USER="root"
 DB_PASSWORD="116345140a9d89e6"
 DATE=$(date +%F)
-PROJECT="api.kundies.com"
+PROJECT="api_hautotool_co"
 
 REDIS_HOST="127.0.0.1"
 REDIS_PORT="6379"
