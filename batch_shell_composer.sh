@@ -1,13 +1,27 @@
 #!/bin/bash
 
 SERVERS=(
+    "45.79.79.208"
     "172.104.152.86"
     "172.233.49.80"
-    "45.79.79.208"
 )
 
 BASE_DIR="/www/wwwroot"
 LOG_FILE="/var/log/composer_update.log"
+
+LOCKFILE="/tmp/batch_shell_composer.lock"
+
+# Check if the script is already running
+if [ -e "$LOCKFILE" ]; then
+    echo "Script is already running."
+    exit 1
+fi
+
+# Create a lock file
+touch "$LOCKFILE"
+
+# Ensure the lock file is removed on script exit
+trap 'rm -f "$LOCKFILE"' EXIT
 
 # Colors
 RED='\033[0;31m'
@@ -77,10 +91,10 @@ process_api_dirs() {
     local server=$1
     log "Processing API directories on $server"
     
-    echo -e "${YELLOW}Server: ${server}${NC}"
+    echo -e "${YELLOW}Server: ${server}${NC} {BASE_DIR: ${BASE_DIR}}"
     
     # Get list of API directories
-    api_dirs=$(ssh -n "$server" "cd ${BASE_DIR} && find . -maxdepth 1 -type d -name 'api*' -printf '%f\n'") || {
+    api_dirs=$(ssh -n "$server" "cd ${BASE_DIR} && find . -maxdepth 1 -type d -name 'api.*' -printf '%f\n'") || {
         error "Failed to list directories on $server"
     }
     

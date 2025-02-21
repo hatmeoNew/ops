@@ -1,11 +1,11 @@
 #!/bin/bash
 # filepath: /www/wwwroot/shell/restore_website.sh
 
-MYSQL_USER="api_wngift_de"
-MYSQL_PASS="tNzNFZ8GdB49CynD"
-MYSQL_DB="api_wngift_de"
+MYSQL_USER="api_hautotool_de"
+MYSQL_PASS="GGEYHbdGNcWRW2YZ"
+MYSQL_DB="api_hautotool_de"
 MYSQL_HOST="127.0.0.1"
-MYSQL_DUMP_FILE="api_wngift_com-2025-01-22.sql.gz"
+MYSQL_DUMP_FILE="api_hautotool_co-2025-01-23.sql.gz"
 TEMP_SQL_FILE="/tmp/mysql_dump.sql"
 
 REDIS_RDB_FILE="redis-dump-12-2025-01-21.rdb"
@@ -19,6 +19,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
+
 
 # Logging function
 log() {
@@ -42,7 +43,7 @@ restore_mysql() {
 
     # update the locale en to de
     # ba_attribute_translations
-    #mysql -h $MYSQL_HOST -u $MYSQL_USER -p$MYSQL_PASS $MYSQL_DB -e "UPDATE ba_attribute_translations SET locale='de' where locale='en';"
+    mysql -h $MYSQL_HOST -u $MYSQL_USER -p$MYSQL_PASS $MYSQL_DB -e "UPDATE ba_attribute_translations SET locale='de' where locale='en';"
     # ba_product_flat
     mysql -h $MYSQL_HOST -u $MYSQL_USER -p$MYSQL_PASS $MYSQL_DB -e "UPDATE ba_product_flat SET locale='de' where locale='en';"
     # ba_product_attribute_values

@@ -4,13 +4,13 @@ from sshtunnel import SSHTunnelForwarder
 # Source Redis connection details
 SRC_REDIS_HOST = '127.0.0.1'
 SRC_REDIS_PORT = 6379
-SRC_REDIS_DB = 21
+SRC_REDIS_DB = 9
 SRC_REDIS_PASSWORD = ''
 
 # Target Redis connection details
 TARGET_REDIS_HOST = '127.0.0.1'
 TARGET_REDIS_PORT = 6379
-TARGET_REDIS_DB = 50
+TARGET_REDIS_DB = 38
 TARGET_REDIS_PASSWORD = ''
 
 # SSH proxy details
