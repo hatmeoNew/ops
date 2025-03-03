@@ -11,6 +11,9 @@ LOG_FILE="/var/log/composer_update.log"
 
 LOCKFILE="/tmp/batch_shell_composer.lock"
 
+STATE_FILE="/tmp/composer_update_state.txt"
+ABORT_FLAG="/tmp/composer_update_abort.flag"
+
 # Check if the script is already running
 if [ -e "$LOCKFILE" ]; then
     echo "Script is already running."
@@ -29,6 +32,30 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
+# Function to save the current state
+save_state() {
+    local server=$1
+    local dir=$2
+    echo "$server $dir" > "$STATE_FILE"
+    log "Saved state: server=$server, dir=$dir"
+}
+
+# Function to clear the state file
+clear_state() {
+    rm -f "$STATE_FILE"
+    log "Cleared state file"
+}
+
+# Function to check for the abort flag
+check_abort() {
+    if [ -e "$ABORT_FLAG" ]; then
+        log "Abort flag found. Exiting."
+        clear_state
+        rm -f "$LOCKFILE" #remove lock file
+        exit 1
+    fi
+}
+
 # Logging function
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$LOG_FILE"
@@ -46,6 +73,9 @@ error() {
 execute_composer_update() {
     local server=$1
     local dir=$2
+
+    check_abort # Check for abort before starting
+
     log "Running composer update in $dir on $server"
 
     echo -e "${YELLOW}Server: ${server}${NC}"
@@ -82,6 +112,9 @@ execute_composer_update() {
 run_artisan_migrate() {
     local server=$1
     local dir=$2
+
+    check_abort # Check for abort before starting
+
     log "Running php artisan migrate in ${BASE_DIR}/${dir} on $server"
     ssh root@$server "cd ${BASE_DIR}/${dir} && php artisan migrate" || error "Artisan migrate failed on $server"
 }
@@ -100,7 +133,12 @@ process_api_dirs() {
     
     # Process each directory
     for dir in $api_dirs; do
+
+        check_abort # Check for abort before each directory
+
         echo -e "${YELLOW}Processing ${dir}...${NC}"
+        save_state "$server" "$dir" # Save state before processing
+
         execute_composer_update "$server" "$dir"
         echo "----------------------------------------"
         echo -e "${YELLOW}Processing Migrate ${dir}...${NC}"
@@ -113,16 +151,56 @@ batch_process() {
     log "Starting batch processing"
     
     for server in "${SERVERS[@]}"; do
+        check_abort # Check for abort before each server
         process_api_dirs "$server"
     done
     
     log "Batch processing completed"
+    clear_state # Clear state after completion
 }
 
 # Main execution
 main() {
-    log "Starting composer update process"
-    batch_process
+     log "Starting composer update process"
+
+    # Check for existing state and check the the shell script is not already running
+    
+
+    if [ -f "$STATE_FILE" ]; then
+        log "Resuming from previous state"
+        read -r server_resume dir_resume < "$STATE_FILE"
+        log "Resuming from server: $server_resume, dir: $dir_resume"
+
+        # Find the server and directory in the lists and resume from there
+        resumed=false
+        for server in "${SERVERS[@]}"; do
+            log "Checking server: $server"
+            log "Checking server_resume: $server_resume"
+            if [ "$server" = "$server_resume" ]; then
+                api_dirs=$(ssh -n "$server" "cd ${BASE_DIR} && find . -maxdepth 1 -type d -name 'api.*' -printf '%f\n'") || {
+                    error "Failed to list directories on $server"
+                }
+                for dir in $api_dirs; do
+                    if [ "$dir" = "$dir_resume" ]; then
+                        resumed=true
+                        echo -e "${YELLOW}Resuming Processing ${dir}...${NC}"
+                        execute_composer_update "$server" "$dir"
+                        echo "----------------------------------------"
+                        echo -e "${YELLOW}Processing Migrate ${dir}...${NC}"
+                        run_artisan_migrate "$server" "$dir"
+                    elif $resumed = true; then
+                        echo -e "${YELLOW}Processing ${dir}...${NC}"
+                        execute_composer_update "$server" "$dir"
+                        echo "----------------------------------------"
+                        echo -e "${YELLOW}Processing Migrate ${dir}...${NC}"
+                        run_artisan_migrate "$server" "$dir"
+                    fi
+                done
+            fi
+        done
+    else
+        batch_process
+    fi
 }
 
 # Run main
