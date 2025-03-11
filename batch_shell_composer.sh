@@ -14,6 +14,8 @@ LOCKFILE="/tmp/batch_shell_composer.lock"
 STATE_FILE="/tmp/composer_update_state.txt"
 ABORT_FLAG="/tmp/composer_update_abort.flag"
 
+API_UPDATE_FLAG="/tmp/api_update.flag"
+
 # Check if the script is already running
 if [ -e "$LOCKFILE" ]; then
     echo "Script is already running."
@@ -83,17 +85,11 @@ execute_composer_update() {
     echo -e "${YELLOW}Updating $dir...${NC}"
 
     # Check if the Apis directory exists
-    if ssh -n "$server" "[ -d ${BASE_DIR}/Apps/Apis ]"; then
-        echo -e "${YELLOW}Executing composer update in $dir on $server${NC}"
-        ssh -n "$server" "cd ${BASE_DIR}/Apps/Apis/ && git pull && cd ${BASE_DIR}/${dir} && git config --global --add safe.directory ${BASE_DIR}/${dir} && git pull && composer update" 2>&1 || {
-            error "Composer update failed in $dir on $server"
-        }
-    else
-        echo -e "${YELLOW}Executing composer update in $dir on $server without Apis directory${NC}"
-        ssh -n "$server" "cd ${BASE_DIR}/${dir} && git config --global --add safe.directory ${BASE_DIR}/${dir} && git checkout main_api && git pull && composer update" 2>&1 || {
-            error "Composer update failed in $dir on $server"
-        }
-    fi
+    
+    echo -e "${YELLOW}Executing composer update in $dir on $server without Apis directory${NC}"
+    ssh -n "$server" "cd ${BASE_DIR}/${dir} && git config --global --add safe.directory ${BASE_DIR}/${dir} && git checkout main_api && git pull && composer update" 2>&1 || {
+        error "Composer update failed in $dir on $server"
+    }
 
     echo -e "${YELLOW}Executing composer update in $dir on $server${NC}"
     
@@ -130,6 +126,14 @@ process_api_dirs() {
     api_dirs=$(ssh -n "$server" "cd ${BASE_DIR} && find . -maxdepth 1 -type d -name 'api.*' -printf '%f\n'") || {
         error "Failed to list directories on $server"
     }
+
+    # if api_dirs is not empty and update the api directory git pull
+    if [ -n "$api_dirs" ]; then
+        echo -e "${YELLOW}Updating Apis directory...${NC}"
+        ssh -n "$server" "cd ${BASE_DIR}/Apps/Apis/ && git pull" 2>&1 || {
+            error "Failed to update Apis directory on $server"
+        }
+    fi
     
     # Process each directory
     for dir in $api_dirs; do
@@ -196,6 +200,8 @@ main() {
                         run_artisan_migrate "$server" "$dir"
                     fi
                 done
+                # rm the state file
+                clear_state
             fi
         done
     else
