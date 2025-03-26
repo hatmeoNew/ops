@@ -38,6 +38,8 @@ execute_composer_update() {
 
     php artisan migrate || error "Failed to run migrations in $dir"
 
+    php artisan onebuy:change-product-rule-save || error "Failed to run onebuy:change-product-rule-save in $dir"
+
     echo -e "${GREEN}Composer update completed in $dir${NC}"
 }
 
