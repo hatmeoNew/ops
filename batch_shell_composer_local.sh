@@ -34,7 +34,7 @@ execute_composer_update() {
     cd "$BASE_DIR/$dir" || error "Failed to change directory to $BASE_DIR/$dir"
     git config --global --add safe.directory "$BASE_DIR/$dir"
     git pull || error "Git pull failed in $dir"
-    composer update -vvv || error "Composer update failed in $dir"
+    composer update -vvv --no-interaction || error "Composer update failed in $dir"
 
     php artisan migrate || error "Failed to run migrations in $dir"
 
