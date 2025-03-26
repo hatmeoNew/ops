@@ -32,6 +32,7 @@ execute_composer_update() {
     echo -e "${YELLOW}Updating $dir...${NC}"
 
     cd "$BASE_DIR/$dir" || error "Failed to change directory to $BASE_DIR/$dir"
+    git remote set-url origin git@github.com:xxl4/NexaMerchant.git
     git config --global --add safe.directory "$BASE_DIR/$dir"
     git pull || error "Git pull failed in $dir"
     composer update --no-interaction || error "Composer update failed in $dir"
@@ -59,7 +60,7 @@ main() {
         execute_composer_update "$dir"
     done
 
-    # get the server ip
+    # get the server ipv4 address
     server_ip=$(curl -s ifconfig.me)
     # send notification to feishu with the server ip
     curl -X POST -H "Content-Type: application/json" -d "{\"msg_type\":\"text\",\"content\":{\"text\":\"Local composer update process completed on $server_ip\"}}" https://open.feishu.cn/open-apis/bot/v2/hook/054d1cae-c463-4200-ad83-4bea82bd07d6
