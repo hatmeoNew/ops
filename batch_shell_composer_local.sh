@@ -40,6 +40,7 @@ execute_composer_update() {
     echo -e "${GREEN}Composer update completed in $dir${NC}"
 }
 
+
 # Main execution
 main() {
     log "Starting local composer update process"
@@ -56,8 +57,12 @@ main() {
         execute_composer_update "$dir"
     done
 
-    # get the server ipv4 address
-    server_ip=$(curl -s ifconfig.me)
+    # Execute composer update in Apps/Apis
+    execute_composer_update "Apps/Apis"
+
+    # get the server ipv4 address use hostname -I
+    server_ip=$(hostname -I | awk '{print $1}')
+    #server_ip=$(curl -s ifconfig.me)
     # send notification to feishu with the server ip
     curl -X POST -H "Content-Type: application/json" -d "{\"msg_type\":\"text\",\"content\":{\"text\":\"Local composer update process completed on $server_ip\"}}" https://open.feishu.cn/open-apis/bot/v2/hook/054d1cae-c463-4200-ad83-4bea82bd07d6
     #curl -X POST -H "Content-Type: application/json" -d '{"msg_type":"text","content":{"text":"Local composer update process completed"}}' https://open.feishu.cn/open-apis/bot/v2/hook/054d1cae-c463-4200-ad83-4bea82bd07d6
