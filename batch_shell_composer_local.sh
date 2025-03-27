@@ -40,6 +40,25 @@ execute_composer_update() {
     echo -e "${GREEN}Composer update completed in $dir${NC}"
 }
 
+# Execute composer update in Apps/Apis directory
+execute_composer_update_api() {
+    local dir=$1
+    log "Running composer update in $dir"
+
+    echo -e "${YELLOW}Updating $dir...${NC}"
+
+    # check if the directory exists
+    if [ ! -d "$BASE_DIR/$dir" ]; then
+        log "Directory $BASE_DIR/$dir does not exist"
+        return
+    fi
+
+    cd "$BASE_DIR/$dir" || error "Failed to change directory to $BASE_DIR/$dir"
+    git pull || error "Git pull failed in $dir"
+
+    echo -e "${GREEN}Composer update completed in $dir${NC}"
+}
+
 
 # Main execution
 main() {
@@ -58,7 +77,7 @@ main() {
     done
 
     # Execute composer update in Apps/Apis
-    execute_composer_update "Apps/Apis"
+    execute_composer_update_api "Apps/Apis"
 
     # get the server ipv4 address use hostname -I
     server_ip=$(hostname -I | awk '{print $1}')
