@@ -32,14 +32,10 @@ execute_composer_update() {
     echo -e "${YELLOW}Updating $dir...${NC}"
 
     cd "$BASE_DIR/$dir" || error "Failed to change directory to $BASE_DIR/$dir"
-    git remote set-url origin git@github.com:xxl4/NexaMerchant.git
-    git config --global --add safe.directory "$BASE_DIR/$dir"
     git pull || error "Git pull failed in $dir"
     composer update --no-interaction || error "Composer update failed in $dir"
 
     php artisan migrate || error "Failed to run migrations in $dir"
-
-    php artisan onebuy:change-product-rule-save || error "Failed to run onebuy:change-product-rule-save in $dir"
 
     echo -e "${GREEN}Composer update completed in $dir${NC}"
 }
