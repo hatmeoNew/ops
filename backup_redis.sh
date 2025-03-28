@@ -7,7 +7,7 @@
 
 # Directory to store the backup files
 BACKUP_DIR="/var/backups/redis"
-DATE=$(date '+%Y-%m-%d %H:%M:%S')
+DATE=$(date '+%Y-%m-%d-%H:%M:%S')
 
 # Check if the backup directory exists, create it if it doesn't
 if [ ! -d "$BACKUP_DIR" ]; then
