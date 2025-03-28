@@ -19,7 +19,7 @@ databases=$(redis-cli INFO keyspace | grep db | cut -d' ' -f1 | cut -d':' -f2)
 # Loop through each database and backup it
 for db in $databases; do
     # Backup the database
-    redis-cli --rdb "$BACKUP_DIR/redis_db_$db.rdb" --db $db
+    redis-cli --rdb "$BACKUP_DIR/redis_db_$db.rdb"
 
     # Compress the backup file
     gzip "$BACKUP_DIR/redis_db_$db.rdb"
