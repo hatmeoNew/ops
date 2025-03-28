@@ -22,7 +22,7 @@ echo "Redis backup completed"
 # Backup file to remote storage linode_object_storage_config
 access_key="OJIPNNJA2RLZL4ZFXYZM"
 secret_key="qywoXKhPUG7NdDcBTzK6wTPWJHfgOl1dd3g7vrGQ"
-cluster-url="https://eu-central-1.linodeobjects.com"
+cluster_url="https://eu-central-1.linodeobjects.com"
 region="eu-central-1"
 bucket="img.kundies.com"
 
@@ -32,7 +32,7 @@ chmod +x mc
 mv mc /usr/local/bin
 
 # Upload the backup file to Linode Object Storage
-mc alias set linode $cluster-url $access_key $secret_key
+mc alias set linode $cluster_url $access_key $secret_key
 
 mc cp "$BACKUP_DIR/redis_backup_$DATE.rdb.gz" "linode/$bucket/redis_backup_$DATE.rdb.gz"
 
