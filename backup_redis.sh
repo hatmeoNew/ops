@@ -7,7 +7,7 @@
 
 # Directory to store the backup files
 BACKUP_DIR="/var/backups/redis"
-DATE=$(date '+%Y-%m-%d')
+DATE=$(date '+%Y-%m-%d %H:%M:%S')
 
 # Check if the backup directory exists, create it if it doesn't
 if [ ! -d "$BACKUP_DIR" ]; then
@@ -25,6 +25,11 @@ secret_key="qywoXKhPUG7NdDcBTzK6wTPWJHfgOl1dd3g7vrGQ"
 cluster-url="https://eu-central-1.linodeobjects.com"
 region="eu-central-1"
 bucket="img.kundies.com"
+
+# Install MinIO client
+wget https://dl.min.io/client/mc/release/linux-amd64/mc
+chmod +x mc
+mv mc /usr/local/bin
 
 # Upload the backup file to Linode Object Storage
 mc alias set linode $cluster-url $access_key $secret_key
