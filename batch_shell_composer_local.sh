@@ -31,11 +31,11 @@ execute_composer_update() {
 
     echo -e "${YELLOW}Updating $dir...${NC}"
 
-    cd "$BASE_DIR/$dir" || error "Failed to change directory to $BASE_DIR/$dir"
-    git pull || error "Git pull failed in $dir"
-    composer update --no-interaction || error "Composer update failed in $dir"
+    cd "$BASE_DIR/$dir" || { error "Failed to change directory to $BASE_DIR/$dir"; return 1; }
+    git pull || { log "Git pull failed in $dir"; send_feishu_notification "Git pull failed in $dir"; return 1; }
+    composer update --no-interaction || { log "Composer update failed in $dir"; send_feishu_notification "Composer update failed in $dir"; return 1; }
 
-    php artisan migrate || error "Failed to run migrations in $dir"
+    php artisan migrate || { log "Failed to run migrations in $dir"; send_feishu_notification "Failed to run migrations in $dir"; return 1; }
 
     echo -e "${GREEN}Composer update completed in $dir${NC}"
 }
@@ -57,6 +57,19 @@ execute_composer_update_api() {
     git pull || error "Git pull failed in $dir"
 
     echo -e "${GREEN}Composer update completed in $dir${NC}"
+}
+
+# Send Feishu notification
+send_feishu_notification() {
+    local message=$1
+    log "Sending Feishu notification: $message"
+
+    server_ip=$(hostname -I | awk '{print $1}')
+
+    # message add server ip
+    message="$message Server IP: $server_ip"
+
+    curl -X POST -H "Content-Type: application/json" -d "{\"msg_type\":\"text\",\"content\":{\"text\":\"$message\"}}" https://open.feishu.cn/open-apis/bot/v2/hook/054d1cae-c463-4200-ad83-4bea82bd07d6
 }
 
 
