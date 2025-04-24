@@ -1,0 +1,34 @@
+PLUGIN_DIR=/www/wwwroot/custom_addons/
+
+$MODULE=${1:-sale_order_batch}
+
+echo "要更新的模块: $MODULE"
+
+cd "$PLUGIN_DIR" || exit 1
+
+for dir in */; do
+    if [ -d "$dir/.git" ]; then
+        echo "Updating $dir"
+        cd "$dir" || continue
+        git pull
+        cd ..
+    fi
+done
+
+ODOO_DIR=/www/wwwroot/odoo_16/
+cd "$ODOO_DIR" || exit 1
+
+# restart odoo with restart.sh
+if [ -f "restart.sh" ]; then
+    echo "Restarting Odoo"
+    bash restart.sh "$MODULE"
+
+    # send msg to feishu + module name
+    message="Odoo has been restarted successfully. Please check the logs for any issues. Module: $MODULE"
+    echo "Sending message to Feishu: $message"
+    # send message to feishu
+    curl -X POST -H "Content-Type: application/json" -d "{\"msg_type\":\"text\",\"content\":{\"text\":\"$message\"}}" https://open.feishu.cn/open-apis/bot/v2/hook/054d1cae-c463-4200-ad83-4bea82bd07d6
+
+else
+    echo "restart.sh not found, skipping Odoo restart"
+fi
