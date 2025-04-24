@@ -1,6 +1,6 @@
 PLUGIN_DIR=/www/wwwroot/custom_addons/
 
-$MODULE=${1:-sale_order_batch}
+MODULE=${1:-sale_order_batch}
 
 echo "要更新的模块: $MODULE"
 
