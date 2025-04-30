@@ -20,6 +20,10 @@ cd "$ODOO_DIR" || exit 1
 
 # restart odoo with restart.sh
 if [ -f "restart.sh" ]; then
+
+    echo "backup the odoo database"
+    base backup_odoo_pg.sh
+
     echo "Restarting Odoo"
     bash restart.sh "$MODULE"
 
