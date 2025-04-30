@@ -27,10 +27,10 @@ if [ -f "restart.sh" ]; then
     echo "Restarting Odoo"
     bash restart.sh "$MODULE"
 
-    # get the git commit id of the module and user name
+    # get the git commit id of the module and get the commit user name
     cd "$PLUGIN_DIR$MODULE" || exit 1
     GIT_COMMIT_ID=$(git rev-parse HEAD)
-    GIT_USER_NAME=$(git config user.name)
+    GIT_USER_NAME=$(git log -1 --pretty=format:'%an')
 
     # add the git commit id and user name to the message
     message="Odoo has been restarted successfully. Please check the logs for any issues. Module: $MODULE, Git Commit ID: $GIT_COMMIT_ID, User: $GIT_USER_NAME"
