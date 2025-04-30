@@ -13,6 +13,9 @@ BACKUP_FILE="$BACKUP_DIR/${PG_DB}_backup_$DATE.sql.gz"
 # 创建备份目录（如不存在）
 mkdir -p "$BACKUP_DIR"
 
+#keep the last 365 days backup
+find "$BACKUP_DIR" -type f -name "${PG_DB}_backup_*.sql.gz" -mtime +365 -exec rm {} \;
+
 # 备份数据库并压缩
 export PGPASSWORD="$PG_PASSWORD"
 pg_dump -U "$PG_USER" -h "$PG_HOST" -p "$PG_PORT" --no-owner --no-privileges --format=custom --compress=9 "$PG_DB" | gzip > "$BACKUP_FILE"
