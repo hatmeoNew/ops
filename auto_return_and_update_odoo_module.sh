@@ -25,7 +25,22 @@ if [ -f "restart.sh" ]; then
     base backup_odoo_pg.sh
 
     echo "Restarting Odoo"
-    bash restart.sh "$MODULE"
+
+    # check if the module is in the list of modules to be updated
+    if [ -z "$MODULE" ]; then
+        echo "No module specified, restarting Odoo without updating any module"
+    else
+        echo "Updating module: $MODULE"
+        # conda activate odoo
+        conda activate odoo
+        # update the module in the odoo database
+        ./odoo-bin -d odoo_16_v2 -u "$MODULE" --stop-after-init --no-http --logfile=/tmp/odoo.log
+    fi
+
+    # restart odoo with supervisorctl
+    supervisorctl restart odoo16
+
+    #bash restart.sh "$MODULE"
 
     # get the git commit id of the module and get the commit user name
     cd "$PLUGIN_DIR$MODULE" || exit 1
