@@ -32,6 +32,7 @@ execute_composer_update() {
     echo -e "${YELLOW}Updating $dir...${NC}"
 
     cd "$BASE_DIR/$dir" || { error "Failed to change directory to $BASE_DIR/$dir"; return 1; }
+    rm composer.lock
     git pull || { log "Git pull failed in $dir"; send_feishu_notification "Git pull failed in $dir"; return 1; }
     composer update --no-interaction || { log "Composer update failed in $dir"; send_feishu_notification "Composer update failed in $dir"; return 1; }
 
