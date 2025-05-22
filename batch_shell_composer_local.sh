@@ -79,7 +79,7 @@ main() {
     log "Starting local composer update process"
 
     # Find directories starting with 'api.'
-    api_dirs=$(find "$BASE_DIR" -maxdepth 1 -type d -iregex '\./\(api\|.*-api\)\.[^/]*' -printf '%f\n')
+    api_dirs=$(find "$BASE_DIR" -maxdepth 1 -type d -iregex '.*/\(api\|.*-api\)\.[^/]*' -printf '%f\n')
 
     if [ -z "$api_dirs" ]; then
         log "No directories found starting with 'api.'"
