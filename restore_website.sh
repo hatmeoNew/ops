@@ -1,4 +1,4 @@
-#!/bin/bash
+cd#!/bin/bash
 # filepath: /www/wwwroot/shell/restore_website.sh
 
 MYSQL_USER="api_hautotool_de"
